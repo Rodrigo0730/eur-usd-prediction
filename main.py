@@ -41,10 +41,10 @@ y_train_tensor = torch.FloatTensor(y_train).view(-1, 1)
 y_test_tensor = torch.FloatTensor(y_test).view(-1, 1)
 
 class LSTM(nn.Module):
-    def __init__(self, input_size=1, hidden_size=50, num_layers=2):
+    def __init__(self, input_size=1, hidden_size=5, num_layers=1, output_size=1):
         super(LSTM, self).__init__()
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, 1)
+        self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         out, _ = self.lstm(x)
@@ -53,8 +53,8 @@ class LSTM(nn.Module):
 
 model = LSTM()
 
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.SmoothL1Loss()
+optimizer = optim.Adamax(model.parameters(), lr=0.03)
 
 num_epochs = 200
 for epoch in range(num_epochs):
@@ -66,7 +66,7 @@ for epoch in range(num_epochs):
     optimizer.step()
 
     if (epoch + 1) % 10 == 0:
-        print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')
+        print(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.6f}')
 
 model.eval()
 with torch.no_grad():
@@ -100,6 +100,7 @@ print(f'Shapiro-Wilk Statistic: {shapiro_stat:.4f}, p-value: {shapiro_p_value:.4
 
 
 
+"""
 plt.figure(figsize=(25, 8))
 plt.plot(actual_prices, label='Actual Prices', color='blue')
 plt.plot(predicted_prices, label='Predicted Prices', color='orange')
@@ -108,6 +109,7 @@ plt.xlabel('Time')
 plt.ylabel('Exchange Rate')
 plt.legend()
 plt.show()
+"""
 
 
 
